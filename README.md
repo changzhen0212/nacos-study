@@ -1,7 +1,10 @@
 # nacos-study
-学习nacos源码，添加注释
+学习nacos源码，添加注释，nacos版本为`1.4.1`
 
-nacos版本为`1.4.1`
+- 带有 // ! 注释的，为核心流程，需要步进
+- 带有 // # 注释的，是主要流程，不需要步进
+
+下载IDEA插件 Better Comments 可自定义高亮注释，方便查看源码
 
 ## 源码编译
 进入nacos目录，执行编译命令, 增加 `-Drat.skip=true` 参数 ，跳过licensing 检查
