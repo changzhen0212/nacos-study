@@ -51,11 +51,11 @@ mvn -Prelease-nacos -Dmaven.test.skip=true -Drat.skip=true clean install -U
 
 nacos集群需要配置mysql存储，需要
 
-1. 先创建数据库
+3.1 先创建数据库
 
-2. 执行 `distribution/conf` 目录下的 `nacos-mysql.sql` 脚本
+3.2 执行 `distribution/conf` 目录下的 `nacos-mysql.sql` 脚本
 
-3. 修改 `console\src\main\resources` 目录下的 `application.properties` 文件里的mysql配置
+3.3 修改 `console\src\main\resources` 目录下的 `application.properties` 文件里的mysql配置
 
    ```properties
    #*************** Config Module Related Configurations ***************#
@@ -75,7 +75,7 @@ nacos集群需要配置mysql存储，需要
 
 
 
-4. 运行console模块里的 `com.alibaba.nacos.Nacos.java`，需要增加启动vm参数端口号和实例运行路径nacos.home(对应的目录需要自己提前创建好)，每台server的`nacos.home`目录里需要创建一个`conf`文件夹，里面放一个`cluster.conf`文件，文件里需要把所有集群机器ip和端口写入进去
+3.4 运行console模块里的 `com.alibaba.nacos.Nacos.java`，需要增加启动vm参数端口号和实例运行路径nacos.home(对应的目录需要自己提前创建好)，每台server的`nacos.home`目录里需要创建一个`conf`文件夹，里面放一个`cluster.conf`文件，文件里需要把所有集群机器ip和端口写入进去
 
 ![image-20220408103628286](images/image-20220408103628286.png)
 
@@ -103,7 +103,7 @@ nacos集群需要配置mysql存储，需要
 
 
 
-5. 分别启动三个Nacos实例
+3.5 分别启动三个Nacos实例
 
 ![image-20220408104147537](images/image-20220408104147537.png)
 
@@ -117,12 +117,12 @@ nacos集群需要配置mysql存储，需要
 
 
 
-6. 浏览器打开 http://localhost:8847/nacos,http://localhost:8848/nacos,http://localhost:8849/nacos都能进入主界面
+3.6 浏览器打开 `http://localhost:8847/nacos`,`http://localhost:8848/nacos`,`http://localhost:8849/nacos`,都能进入主界面
 
    ![image-20220408104617033](images/image-20220408104617033.png)
 
 
 
-7. 用户名密码均为`nacos`
+3.7 用户名密码均为`nacos`
 
 ![image-20220408104653347](images/image-20220408104653347.png)
