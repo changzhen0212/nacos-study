@@ -29,7 +29,7 @@ mvn -Prelease-nacos -Dmaven.test.skip=true -Drat.skip=true clean install -U
  -Dnacos.standalone=true
 ```
 
-![image-20220408101040309](images\202204081010208.png)
+![image-20220408101040309](images/202204081010208.png)
 
 
 
@@ -43,7 +43,7 @@ mvn -Prelease-nacos -Dmaven.test.skip=true -Drat.skip=true clean install -U
 
 2.2 启动main
 
-![image-20220408101423237](images\202204081014898.png)
+![image-20220408101423237](images/202204081014898.png)
 
 
 
@@ -77,7 +77,7 @@ nacos集群需要配置mysql存储，需要
 
 4. 运行console模块里的 `com.alibaba.nacos.Nacos.java`，需要增加启动vm参数端口号和实例运行路径nacos.home(对应的目录需要自己提前创建好)，每台server的`nacos.home`目录里需要创建一个`conf`文件夹，里面放一个`cluster.conf`文件，文件里需要把所有集群机器ip和端口写入进去
 
-![image-20220408103628286](images\image-20220408103628286.png)
+![image-20220408103628286](images/image-20220408103628286.png)
 
 ```properties
 127.0.0.1:8847
@@ -95,34 +95,34 @@ nacos集群需要配置mysql存储，需要
 
 
 
-![image-20220408103748393](images\image-20220408103748393.png)
+![image-20220408103748393](images/image-20220408103748393.png)
 
-![image-20220408103806559](images\image-20220408103806559.png)
+![image-20220408103806559](images/image-20220408103806559.png)
 
-![image-20220408103710505](images\202204081037842.png)
+![image-20220408103710505](images/202204081037842.png)
 
 
 
 5. 分别启动三个Nacos实例
 
-![image-20220408104147537](images\image-20220408104147537.png)
+![image-20220408104147537](images/image-20220408104147537.png)
 
 
 
-![image-20220408104215950](images\image-20220408104215950.png)
+![image-20220408104215950](images/image-20220408104215950.png)
 
 
 
-![image-20220408104234985](images\image-20220408104234985.png)
+![image-20220408104234985](images/image-20220408104234985.png)
 
 
 
 6. 浏览器打开 http://localhost:8847/nacos,http://localhost:8848/nacos,http://localhost:8849/nacos都能进入主界面
 
-   ![image-20220408104617033](images\image-20220408104617033.png)
+   ![image-20220408104617033](images/image-20220408104617033.png)
 
 
 
 7. 用户名密码均为`nacos`
 
-![image-20220408104653347](images\image-20220408104653347.png)
+![image-20220408104653347](images/image-20220408104653347.png)
