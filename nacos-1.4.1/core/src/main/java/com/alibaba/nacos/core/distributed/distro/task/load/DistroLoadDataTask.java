@@ -37,17 +37,17 @@ import java.util.concurrent.TimeUnit;
  * @author xiweng.yy
  */
 public class DistroLoadDataTask implements Runnable {
-    
+
     private final ServerMemberManager memberManager;
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     private final DistroConfig distroConfig;
-    
+
     private final DistroCallback loadCallback;
-    
+
     private final Map<String, Boolean> loadCompletedMap;
-    
+
     public DistroLoadDataTask(ServerMemberManager memberManager, DistroComponentHolder distroComponentHolder,
             DistroConfig distroConfig, DistroCallback loadCallback) {
         this.memberManager = memberManager;
@@ -56,10 +56,11 @@ public class DistroLoadDataTask implements Runnable {
         this.loadCallback = loadCallback;
         loadCompletedMap = new HashMap<>(1);
     }
-    
+
     @Override
     public void run() {
         try {
+            // ! 步进
             load();
             if (!checkCompleted()) {
                 GlobalExecutor.submitLoadDataTask(this, distroConfig.getLoadDataRetryDelayMillis());
@@ -72,7 +73,7 @@ public class DistroLoadDataTask implements Runnable {
             Loggers.DISTRO.error("[DISTRO-INIT] load snapshot data failed. ", e);
         }
     }
-    
+
     private void load() throws Exception {
         while (memberManager.allMembersWithoutSelf().isEmpty()) {
             Loggers.DISTRO.info("[DISTRO-INIT] waiting server list init...");
@@ -84,11 +85,12 @@ public class DistroLoadDataTask implements Runnable {
         }
         for (String each : distroComponentHolder.getDataStorageTypes()) {
             if (!loadCompletedMap.containsKey(each) || !loadCompletedMap.get(each)) {
+                // ! loadAllDataSnapshotFromRemote(each) 从远端拉数据
                 loadCompletedMap.put(each, loadAllDataSnapshotFromRemote(each));
             }
         }
     }
-    
+
     private boolean loadAllDataSnapshotFromRemote(String resourceType) {
         DistroTransportAgent transportAgent = distroComponentHolder.findTransportAgent(resourceType);
         DistroDataProcessor dataProcessor = distroComponentHolder.findDataProcessor(resourceType);
@@ -97,14 +99,19 @@ public class DistroLoadDataTask implements Runnable {
                     resourceType, transportAgent, dataProcessor);
             return false;
         }
+        // ! 遍历不包含自己的数据
         for (Member each : memberManager.allMembersWithoutSelf()) {
             try {
                 Loggers.DISTRO.info("[DISTRO-INIT] load snapshot {} from {}", resourceType, each.getAddress());
+                // ! 获取快照. 进入 getDatumSnapshot 实现方法
                 DistroData distroData = transportAgent.getDatumSnapshot(each.getAddress());
+                // ! 处理同步数据
                 boolean result = dataProcessor.processSnapshot(distroData);
                 Loggers.DISTRO
                         .info("[DISTRO-INIT] load snapshot {} from {} result: {}", resourceType, each.getAddress(),
                                 result);
+                // # 只同步一台机器的数据, 成功就返回, 要是有5,6台机器, 其他的机器不会同步.
+                // # 如果失败了再同步其他机器.
                 if (result) {
                     return true;
                 }
@@ -114,7 +121,7 @@ public class DistroLoadDataTask implements Runnable {
         }
         return false;
     }
-    
+
     private boolean checkCompleted() {
         if (distroComponentHolder.getDataStorageTypes().size() != loadCompletedMap.size()) {
             return false;

@@ -29,14 +29,14 @@ import com.alibaba.nacos.core.utils.Loggers;
  * @author xiweng.yy
  */
 public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     public DistroSyncChangeTask(DistroKey distroKey, DistroComponentHolder distroComponentHolder) {
         super(distroKey);
         this.distroComponentHolder = distroComponentHolder;
     }
-    
+
     @Override
     public void run() {
         Loggers.DISTRO.info("[DISTRO-START] {}", toString());
@@ -44,7 +44,9 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
             String type = getDistroKey().getResourceType();
             DistroData distroData = distroComponentHolder.findDataStorage(type).getDistroData(getDistroKey());
             distroData.setType(DataOperation.CHANGE);
+            // ! 从远端获取结果 进入实现类syncData HttpClient.httpPutLarge调用
             boolean result = distroComponentHolder.findTransportAgent(type).syncData(distroData, getDistroKey().getTargetServer());
+            // ! 失败重试
             if (!result) {
                 handleFailedTask();
             }
@@ -54,7 +56,7 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
             handleFailedTask();
         }
     }
-    
+
     private void handleFailedTask() {
         String type = getDistroKey().getResourceType();
         DistroFailedTaskHandler failedTaskHandler = distroComponentHolder.findFailedTaskHandler(type);
@@ -64,7 +66,7 @@ public class DistroSyncChangeTask extends AbstractDistroExecuteTask {
         }
         failedTaskHandler.retry(getDistroKey(), DataOperation.CHANGE);
     }
-    
+
     @Override
     public String toString() {
         return "DistroSyncChangeTask for " + getDistroKey().toString();

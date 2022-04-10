@@ -42,60 +42,64 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class DistroProtocol {
-    
+
     private final ServerMemberManager memberManager;
-    
+
     private final DistroComponentHolder distroComponentHolder;
-    
+
     private final DistroTaskEngineHolder distroTaskEngineHolder;
-    
+
     private final DistroConfig distroConfig;
-    
+
     private volatile boolean isInitialized = false;
-    
+
     public DistroProtocol(ServerMemberManager memberManager, DistroComponentHolder distroComponentHolder,
             DistroTaskEngineHolder distroTaskEngineHolder, DistroConfig distroConfig) {
         this.memberManager = memberManager;
         this.distroComponentHolder = distroComponentHolder;
         this.distroTaskEngineHolder = distroTaskEngineHolder;
         this.distroConfig = distroConfig;
+        // ! 启动任务
         startDistroTask();
     }
-    
+
     private void startDistroTask() {
         if (EnvUtil.getStandaloneMode()) {
             isInitialized = true;
             return;
         }
+        // ! 开启验证任务
         startVerifyTask();
+        // ! 开启加载任务
         startLoadTask();
     }
-    
+
     private void startLoadTask() {
         DistroCallback loadCallback = new DistroCallback() {
             @Override
             public void onSuccess() {
                 isInitialized = true;
             }
-            
+
             @Override
             public void onFailed(Throwable throwable) {
                 isInitialized = false;
             }
         };
+        // ! 提交加载数据任务, 进入 DistroLoadDataTask#run方法
         GlobalExecutor.submitLoadDataTask(
                 new DistroLoadDataTask(memberManager, distroComponentHolder, distroConfig, loadCallback));
     }
-    
+
     private void startVerifyTask() {
         GlobalExecutor.schedulePartitionDataTimedSync(new DistroVerifyTask(memberManager, distroComponentHolder),
                 distroConfig.getVerifyIntervalMillis());
     }
-    
+
     public boolean isInitialized() {
         return isInitialized;
     }
-    
+
     /**
      * Start to sync by configured delay.
      *
@@ -105,7 +109,7 @@ public class DistroProtocol {
     public void sync(DistroKey distroKey, DataOperation action) {
         sync(distroKey, action, distroConfig.getSyncDelayMillis());
     }
-    
+
     /**
      * Start to sync data to all remote server.
      *
@@ -113,17 +117,21 @@ public class DistroProtocol {
      * @param action    the action of data operation
      */
     public void sync(DistroKey distroKey, DataOperation action, long delay) {
+        // # 遍历集群中的所有节点, 除开自己
         for (Member each : memberManager.allMembersWithoutSelf()) {
+            // # 远端机器(要同步的机器)的IP 端口 等信息封装, 包装上target目标机器
             DistroKey distroKeyWithTarget = new DistroKey(distroKey.getResourceKey(), distroKey.getResourceType(),
                     each.getAddress());
             DistroDelayTask distroDelayTask = new DistroDelayTask(distroKeyWithTarget, action, delay);
+            // ! 把封装的信息放入task, 再把task放入线程池, 查看addTask, 就是个ConcurrentHashMap
+            // ! 找到执行task的线程,就是真正向远端发送数据的逻辑--> DistroTaskEngineHolder 初始化时
             distroTaskEngineHolder.getDelayTaskExecuteEngine().addTask(distroKeyWithTarget, distroDelayTask);
             if (Loggers.DISTRO.isDebugEnabled()) {
                 Loggers.DISTRO.debug("[DISTRO-SCHEDULE] {} to {}", distroKey, each.getAddress());
             }
         }
     }
-    
+
     /**
      * Query data from specified server.
      *
@@ -143,7 +151,7 @@ public class DistroProtocol {
         }
         return transportAgent.getData(distroKey, distroKey.getTargetServer());
     }
-    
+
     /**
      * Receive synced distro data, find processor to process.
      *
@@ -159,7 +167,7 @@ public class DistroProtocol {
         }
         return dataProcessor.processData(distroData);
     }
-    
+
     /**
      * Receive verify data, find processor to process.
      *
@@ -175,7 +183,7 @@ public class DistroProtocol {
         }
         return dataProcessor.processVerifyData(distroData);
     }
-    
+
     /**
      * Query data of input distro key.
      *
@@ -191,7 +199,7 @@ public class DistroProtocol {
         }
         return distroDataStorage.getDistroData(distroKey);
     }
-    
+
     /**
      * Query all datum snapshot.
      *
