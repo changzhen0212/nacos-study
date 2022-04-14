@@ -25,7 +25,7 @@ import com.alibaba.nacos.api.exception.NacosException;
  * @author Nacos
  */
 public interface ConfigService {
-    
+
     /**
      * Get config.
      *
@@ -35,8 +35,9 @@ public interface ConfigService {
      * @return config value
      * @throws NacosException NacosException
      */
+    // ! 获取配置
     String getConfig(String dataId, String group, long timeoutMs) throws NacosException;
-    
+
     /**
      * Get config and register Listener.
      *
@@ -54,7 +55,7 @@ public interface ConfigService {
      */
     String getConfigAndSignListener(String dataId, String group, long timeoutMs, Listener listener)
             throws NacosException;
-    
+
     /**
      * Add a listener to the configuration, after the server modified the configuration, the client will use the
      * incoming listener callback. Recommended asynchronous processing, the application can implement the getExecutor
@@ -67,7 +68,7 @@ public interface ConfigService {
      * @throws NacosException NacosException
      */
     void addListener(String dataId, String group, Listener listener) throws NacosException;
-    
+
     /**
      * Publish config.
      *
@@ -78,7 +79,7 @@ public interface ConfigService {
      * @throws NacosException NacosException
      */
     boolean publishConfig(String dataId, String group, String content) throws NacosException;
-    
+
     /**
      * Publish config.
      *
@@ -90,7 +91,7 @@ public interface ConfigService {
      * @throws NacosException NacosException
      */
     boolean publishConfig(String dataId, String group, String content, String type) throws NacosException;
-    
+
     /**
      * Remove config.
      *
@@ -100,7 +101,7 @@ public interface ConfigService {
      * @throws NacosException NacosException
      */
     boolean removeConfig(String dataId, String group) throws NacosException;
-    
+
     /**
      * Remove listener.
      *
@@ -109,14 +110,14 @@ public interface ConfigService {
      * @param listener listener
      */
     void removeListener(String dataId, String group, Listener listener);
-    
+
     /**
      * Get server status.
      *
      * @return whether health
      */
     String getServerStatus();
-    
+
     /**
      * Shutdown the resource service.
      *
