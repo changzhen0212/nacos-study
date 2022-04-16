@@ -32,7 +32,7 @@ import javax.annotation.PostConstruct;
 @Conditional(ConditionOnExternalStorage.class)
 @Component
 public class ExternalDumpService extends DumpService {
-    
+
     /**
      * Here you inject the dependent objects constructively, ensuring that some of the dependent functionality is
      * initialized ahead of time.
@@ -43,13 +43,14 @@ public class ExternalDumpService extends DumpService {
     public ExternalDumpService(PersistService persistService, ServerMemberManager memberManager) {
         super(persistService, memberManager);
     }
-    
-    @PostConstruct
+
+    @PostConstruct // # spring的后置处理器, 初始化前调用
     @Override
     protected void init() throws Throwable {
+        // ! 转储操作 区分全量和增量
         dumpOperate(processor, dumpAllProcessor, dumpAllBetaProcessor, dumpAllTagProcessor);
     }
-    
+
     @Override
     protected boolean canExecute() {
         return memberManager.isFirstIp();

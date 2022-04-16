@@ -174,6 +174,7 @@ public class ConfigServletInner {
                             if (PropertyUtil.isDirectRead()) {
                                 configInfoBase = persistService.findConfigInfo4Tag(dataId, group, tenant, autoTag);
                             } else {
+                                // !
                                 file = DiskUtil.targetTagFile(dataId, group, tenant, autoTag);
                             }
 
@@ -185,6 +186,7 @@ public class ConfigServletInner {
                             if (PropertyUtil.isDirectRead()) {
                                 configInfoBase = persistService.findConfigInfo(dataId, group, tenant);
                             } else {
+                                // !
                                 file = DiskUtil.targetFile(dataId, group, tenant);
                             }
                             if (configInfoBase == null && fileNotExist(file)) {
