@@ -46,7 +46,8 @@ public class DelegateConsistencyServiceImpl implements ConsistencyService {
     @Override
     public void put(String key, Record value) throws NacosException {
         // ! 往下走 根据`mapConsistencyService(key)` 返回的对象, 确认具体进哪个实现方法,
-        // ! 最终确认到是DistroConsistencyServiceImpl, 进入它的put方法
+        // ! AP架构,实现Distro协议,最终确认到是DistroConsistencyServiceImpl, 进入它的put方法
+        // ! CP架构是Raft协议, 进入 RaftConsistencyServiceImpl#put方法
         // # key 是刚才上一步生成的字符串, Record是instance的接口
         mapConsistencyService(key).put(key, value);
     }

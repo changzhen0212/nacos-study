@@ -36,15 +36,15 @@ import java.util.function.Function;
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
 public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
-    
+
     private final Map<String, ConcurrentHashSet<RecordListener>> listenerMap = new ConcurrentHashMap<>(32);
-    
+
     private final Function<String, Record> find;
-    
+
     public PersistentNotifier(Function<String, Record> find) {
         this.find = find;
     }
-    
+
     /**
      * register listener with key.
      *
@@ -55,7 +55,7 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
         listenerMap.computeIfAbsent(key, s -> new ConcurrentHashSet<>());
         listenerMap.get(key).add(listener);
     }
-    
+
     /**
      * deregister listener by key.
      *
@@ -68,7 +68,7 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
         }
         listenerMap.get(key).remove(listener);
     }
-    
+
     /**
      * deregister all listener by key.
      *
@@ -77,11 +77,11 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
     public void deregisterAllListener(final String key) {
         listenerMap.remove(key);
     }
-    
+
     public Map<String, ConcurrentHashSet<RecordListener>> getListeners() {
         return listenerMap;
     }
-    
+
     /**
      * notify value to listener with {@link DataOperation} and key.
      *
@@ -96,9 +96,11 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
                 for (RecordListener listener : listenerMap.get(KeyBuilder.SERVICE_META_KEY_PREFIX)) {
                     try {
                         if (action == DataOperation.CHANGE) {
+                            // ! 监听修改事件, 进入 Service 实现方法
                             listener.onChange(key, value);
                         }
                         if (action == DataOperation.DELETE) {
+                            // ! 监听删除事件
                             listener.onDelete(key);
                         }
                     } catch (Throwable e) {
@@ -107,11 +109,11 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
                 }
             }
         }
-        
+
         if (!listenerMap.containsKey(key)) {
             return;
         }
-        
+
         for (RecordListener listener : listenerMap.get(key)) {
             try {
                 if (action == DataOperation.CHANGE) {
@@ -126,12 +128,14 @@ public final class PersistentNotifier extends Subscriber<ValueChangeEvent> {
             }
         }
     }
-    
+
+    // ! 监听Raft发布事件
     @Override
     public void onEvent(ValueChangeEvent event) {
+        // ! 通知 发布事件
         notify(event.getKey(), event.getAction(), find.apply(event.getKey()));
     }
-    
+
     @Override
     public Class<? extends Event> subscribeType() {
         return ValueChangeEvent.class;
