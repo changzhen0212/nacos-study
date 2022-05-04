@@ -463,7 +463,7 @@ public class InstanceController {
 
         ObjectNode result = JacksonUtils.createEmptyJsonNode();
         result.put(SwitchEntry.CLIENT_BEAT_INTERVAL, switchDomain.getClientBeatInterval());
-
+        // # 获取心跳信息
         String beat = WebUtils.optional(request, "beat", StringUtils.EMPTY);
         RsInfo clientBeat = null;
         if (StringUtils.isNotBlank(beat)) {
@@ -487,8 +487,9 @@ public class InstanceController {
         String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);
         NamingUtils.checkServiceNameFormat(serviceName);
         Loggers.SRV_LOG.debug("[CLIENT-BEAT] full arguments: beat: {}, serviceName: {}", clientBeat, serviceName);
+        // ! 根据指定的namespaceId, 服务名称, ip,端口号 获取服务实例
         Instance instance = serviceManager.getInstance(namespaceId, serviceName, clusterName, ip, port);
-
+        // # 如果实例为空,则注册到注册中心
         if (instance == null) {
             if (clientBeat == null) {
                 result.put(CommonParams.CODE, NamingResponseCode.RESOURCE_NOT_FOUND);
@@ -507,10 +508,10 @@ public class InstanceController {
             instance.setServiceName(serviceName);
             instance.setInstanceId(instance.getInstanceId());
             instance.setEphemeral(clientBeat.isEphemeral());
-
+            // ! 注册实例
             serviceManager.registerInstance(namespaceId, serviceName, instance);
         }
-
+        // ! 获取服务
         Service service = serviceManager.getService(namespaceId, serviceName);
 
         if (service == null) {
@@ -523,6 +524,7 @@ public class InstanceController {
             clientBeat.setPort(port);
             clientBeat.setCluster(clusterName);
         }
+        // ! 处理服务心跳
         service.processClientBeat(clientBeat);
 
         result.put(CommonParams.CODE, NamingResponseCode.OK);

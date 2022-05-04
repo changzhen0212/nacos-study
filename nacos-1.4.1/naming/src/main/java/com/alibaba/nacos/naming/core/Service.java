@@ -127,9 +127,11 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
      * @param rsInfo metrics info of server
      */
     public void processClientBeat(final RsInfo rsInfo) {
+        // ! 客户端心跳处理任务,查看run方法
         ClientBeatProcessor clientBeatProcessor = new ClientBeatProcessor();
         clientBeatProcessor.setService(this);
         clientBeatProcessor.setRsInfo(rsInfo);
+        // ! 立即发送
         HealthCheckReactor.scheduleNow(clientBeatProcessor);
     }
 
@@ -372,7 +374,7 @@ public class Service extends com.alibaba.nacos.api.naming.pojo.Service implement
             if (clusterObj == null) {
                 continue;
             }
-            // ! 获取全部实例存入List
+            // ! 获取全部实例存入List allIPs
             result.addAll(clusterObj.allIPs());
         }
         return result;

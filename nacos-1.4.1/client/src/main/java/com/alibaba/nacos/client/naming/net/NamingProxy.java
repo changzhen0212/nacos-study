@@ -241,7 +241,7 @@ public class NamingProxy implements Closeable {
         params.put("healthy", String.valueOf(instance.isHealthy()));
         params.put("ephemeral", String.valueOf(instance.isEphemeral()));
         params.put("metadata", JacksonUtils.toJson(instance.getMetadata()));
-        // ! 调用Http接口 nacosUrlInstance=/v1/ns/instance
+        // ! 调用Http接口 POST nacosUrlInstance=/v1/ns/instance
         reqApi(UtilAndComs.nacosUrlInstance, params, HttpMethod.POST);
 
     }

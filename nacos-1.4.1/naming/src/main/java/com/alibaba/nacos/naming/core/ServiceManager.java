@@ -702,6 +702,7 @@ public class ServiceManager implements RecordListener<Service> {
     }
 
     public Instance getInstance(String namespaceId, String serviceName, String cluster, String ip, int port) {
+        // ! 根据namespaceId, 服务名称,获取服务
         Service service = getService(namespaceId, serviceName);
         if (service == null) {
             return null;

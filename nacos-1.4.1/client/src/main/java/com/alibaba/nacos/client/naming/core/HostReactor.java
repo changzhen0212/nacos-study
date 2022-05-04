@@ -282,6 +282,7 @@ public class HostReactor implements Closeable {
         }
     }
 
+    // # 获取客户端的服务实例缓存信息
     private ServiceInfo getServiceInfo0(String serviceName, String clusters) {
 
         String key = ServiceInfo.getKey(serviceName, clusters);
