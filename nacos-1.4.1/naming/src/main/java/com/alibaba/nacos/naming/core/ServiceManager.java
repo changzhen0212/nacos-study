@@ -81,7 +81,8 @@ import static com.alibaba.nacos.naming.misc.UtilsAndCommons.UPDATE_INSTANCE_META
 public class ServiceManager implements RecordListener<Service> {
 
     /**
-     * Map(namespace, Map(group::serviceName, Service)).
+     * !!! Nacos注册中心结构
+     * ! Map(namespace, Map(group::serviceName, Service)).
      */
     // ! 看service
     private final Map<String, Map<String, Service>> serviceMap = new ConcurrentHashMap<>();
